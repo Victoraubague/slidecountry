@@ -10,59 +10,59 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: CountryInfoScreen(),
+      home: CountriesListScreen(),
     );
   }
 }
 
-class CountryInfoScreen extends StatefulWidget {
+class CountriesListScreen extends StatefulWidget {
   @override
-  _CountryInfoScreenState createState() => _CountryInfoScreenState();
+  _CountriesListScreenState createState() => _CountriesListScreenState();
 }
 
-class _CountryInfoScreenState extends State<CountryInfoScreen> {
-  late Map<String, dynamic> countryData;
+class _CountriesListScreenState extends State<CountriesListScreen> {
+  List<dynamic> countries = [];
 
-  Future<void> fetchCountryInfo() async {
-    final response = await http.get(Uri.parse('https://restcountries.com/v3.1/name/france'));
+  Future<void> fetchCountries() async {
+    final response = await http.get(Uri.parse('https://restcountries.com/v3.1/all'));
 
     if (response.statusCode == 200) {
       setState(() {
-        countryData = json.decode(response.body)[0];
+        countries = json.decode(response.body);
       });
     } else {
-      throw Exception('Failed to load country data');
+      throw Exception('Failed to load countries');
     }
   }
 
   @override
   void initState() {
     super.initState();
-    fetchCountryInfo();
+    fetchCountries();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Country Information'),
+        title: Text('Tout les pays'),
       ),
-      body: countryData == null
+      body: countries.isEmpty
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Country: ${countryData['name']['common']}'),
-                  Text('Capital: ${countryData['capital'][0]}'),
-                  Text('Population: ${countryData['population']}'),
-                  Text('Region: ${countryData['region']}'),
-                  Text('Subregion: ${countryData['subregion']}'),
-                  Text('Currency: ${countryData['currencies'].values.first['name']}'),
-                  Image.network(countryData['flags']['png']),
-                ],
-              ),
+          : ListView.builder(
+              itemCount: countries.length,
+              itemBuilder: (context, index) {
+                final country = countries[index];
+                return ListTile(
+                  leading: Image.network(
+                    country['flags']['png'],
+                    width: 50,
+                    height: 50,
+                  ),
+                  title: Text(country['name']['common']),
+                  subtitle: Text('Capital: ${country['capital'] != null ? country['capital'][0] : 'N/A'}'),
+                );
+              },
             ),
     );
   }
