@@ -51,15 +51,15 @@ class _HomeScreenState extends State<HomeScreen> {
         items: const [
           BottomNavigationBarItem(
             icon: Text('🚩', style: TextStyle(fontSize: 24)),
-            label: 'Drapeau',
-          ),
-          BottomNavigationBarItem(
-            icon: Text('❤️', style: TextStyle(fontSize: 24)),
-            label: 'Cœur',
+            label: 'Pays',
           ),
           BottomNavigationBarItem(
             icon: Text('⚡️', style: TextStyle(fontSize: 24)),
-            label: 'Éclair',
+            label: 'Tinder',
+          ),
+          BottomNavigationBarItem(
+            icon: Text('❤️', style: TextStyle(fontSize: 24)),
+            label: 'Classement',
           ),
         ],
       ),

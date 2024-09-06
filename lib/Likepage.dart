@@ -11,7 +11,7 @@ class LikePage extends StatelessWidget {
       ),
       body: const Center(
         child: Text(
-          'Ceci est la page avec un cœur ❤️',
+          '',
           style: TextStyle(fontSize: 24),
         ),
       ),
