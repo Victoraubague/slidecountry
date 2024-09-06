@@ -6,7 +6,6 @@ class LikePage extends StatefulWidget {
   const LikePage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LikePageState createState() => _LikePageState();
 }
 
@@ -16,7 +15,7 @@ class _LikePageState extends State<LikePage> {
   List<String> continents = ['All', 'Africa', 'Europe', 'Asia', 'Americas', 'Oceania'];
   String selectedContinent = 'All';
   int currentIndex = 0;
-  double sliderValue = 0.5; 
+  double sliderValue = 0.5;
   int roundNumber = 1;
 
   Future<void> fetchCountries() async {
@@ -62,7 +61,6 @@ class _LikePageState extends State<LikePage> {
         _showWinner(filteredCountries.first);
       }
       if (currentIndex + 1 >= filteredCountries.length) {
-     
         currentIndex = 0;
         roundNumber++;
       }
@@ -73,13 +71,12 @@ class _LikePageState extends State<LikePage> {
     setState(() {
       sliderValue = value;
 
-     
       if (sliderValue <= 0.1) {
         _onButtonSelection(true);
-        sliderValue = 0.5; 
+        sliderValue = 0.5;
       } else if (sliderValue >= 0.9) {
-        _onButtonSelection(false); 
-        sliderValue = 0.5; 
+        _onButtonSelection(false);
+        sliderValue = 0.5;
       }
     });
   }
@@ -87,9 +84,9 @@ class _LikePageState extends State<LikePage> {
   void _onButtonSelection(bool isCountry1) {
     setState(() {
       if (isCountry1) {
-        _onSwipe(filteredCountries[currentIndex + 1]); 
+        _onSwipe(filteredCountries[currentIndex + 1]);
       } else {
-        _onSwipe(filteredCountries[currentIndex]); 
+        _onSwipe(filteredCountries[currentIndex]);
       }
 
       currentIndex += 2;
@@ -138,50 +135,88 @@ class _LikePageState extends State<LikePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Concours de Pays - Round $roundNumber'),
-        actions: [
-          DropdownButton<String>(
-            value: selectedContinent,
-            icon: const Icon(Icons.public, color: Colors.white),
-            dropdownColor: Colors.blue,
-            onChanged: (String? newValue) {
-              if (newValue != null) {
-                _filterByContinent(newValue);
-              }
-            },
-            items: continents.map<DropdownMenuItem<String>>((String continent) {
-              return DropdownMenuItem<String>(
-                value: continent,
-                child: Text(continent),
-              );
-            }).toList(),
+      body: Stack(
+        children: [
+     
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: ClipPath(
+              clipper: CloudAppBarClipper(),
+              child: Container(
+                height: 150, 
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.white, Color.fromARGB(255, 186, 28, 214)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 40, 16, 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Pays - Round $roundNumber',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      DropdownButton<String>(
+                        value: selectedContinent,
+                        icon: const Icon(Icons.public, color: Colors.black),
+                        dropdownColor: Colors.blue,
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            _filterByContinent(newValue);
+                          }
+                        },
+                        items: continents.map<DropdownMenuItem<String>>((String continent) {
+                          return DropdownMenuItem<String>(
+                            value: continent,
+                            child: Text(continent),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.only(top: 160),
+            child: filteredCountries.length > 1
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          if (currentIndex < filteredCountries.length)
+                            _buildCountryCard(filteredCountries[currentIndex]),
+                          if (currentIndex + 1 < filteredCountries.length)
+                            _buildCountryCard(filteredCountries[currentIndex + 1]),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      _buildSliderSelection(),
+                    ],
+                  )
+                : const Center(
+                    child: Text(
+                      'Aucun pays trouvé',
+                      style: TextStyle(fontSize: 24),
+                    ),
+                  ),
           ),
         ],
       ),
-      body: filteredCountries.length > 1
-          ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    if (currentIndex < filteredCountries.length)
-                      _buildCountryCard(filteredCountries[currentIndex]), 
-                    if (currentIndex + 1 < filteredCountries.length)
-                      _buildCountryCard(filteredCountries[currentIndex + 1]), 
-                  ],
-                ),
-                const SizedBox(height: 20),
-                _buildSliderSelection(), 
-              ],
-            )
-          : const Center(
-              child: Text(
-                'Aucun pays trouvé',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
     );
   }
 
@@ -189,7 +224,7 @@ class _LikePageState extends State<LikePage> {
     return Card(
       elevation: 5,
       child: Container(
-        width: 150, 
+        width: 150,
         height: 300,
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -233,11 +268,11 @@ class _LikePageState extends State<LikePage> {
         ),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            thumbShape: _CustomFlagThumb(), 
+            thumbShape: _CustomFlagThumb(),
             trackHeight: 4.0,
-            activeTrackColor: Colors.blueAccent,
-            inactiveTrackColor: Colors.grey[300],
-            overlayColor: Colors.blue.withAlpha(32),
+            activeTrackColor: const Color.fromARGB(255, 255, 27, 168),
+            inactiveTrackColor: const Color.fromARGB(255, 61, 50, 61),
+            overlayColor: const Color.fromARGB(255, 194, 168, 84).withAlpha(32),
             valueIndicatorTextStyle: const TextStyle(color: Colors.black),
           ),
           child: Slider(
@@ -255,40 +290,38 @@ class _LikePageState extends State<LikePage> {
   }
 }
 
-
 class _CustomFlagThumb extends SliderComponentShape {
   @override
   Size getPreferredSize(bool isEnabled, bool isDiscrete) {
-    return const Size(35.0, 35.0); 
+    return const Size(35.0, 35.0);
   }
 
   @override
   void paint(
-      PaintingContext context,
-      Offset center, {
-      required Animation<double> activationAnimation,
-      required Animation<double> enableAnimation,
-      required bool isDiscrete,
-      required TextPainter labelPainter,
-      required RenderBox parentBox,
-      required SliderThemeData sliderTheme,
-      required TextDirection textDirection,
-      required double value,
-      required double textScaleFactor,
-      required Size sizeWithOverflow,
+    PaintingContext context,
+    Offset center, {
+    required Animation<double> activationAnimation,
+    required Animation<double> enableAnimation,
+    required bool isDiscrete,
+    required TextPainter labelPainter,
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required TextDirection textDirection,
+    required double value,
+    required double textScaleFactor,
+    required Size sizeWithOverflow,
   }) {
     final canvas = context.canvas;
-    const flagIcon = Icons.flag; 
+    const flagIcon = Icons.flag;
     const flagSize = 24.0;
 
-    
     TextPainter painter = TextPainter(
       text: TextSpan(
         text: String.fromCharCode(flagIcon.codePoint),
         style: TextStyle(
           fontSize: flagSize,
           fontFamily: flagIcon.fontFamily,
-          color: Colors.blue,
+          color: const Color.fromARGB(255, 219, 17, 186),
         ),
       ),
       textAlign: TextAlign.center,
@@ -296,5 +329,30 @@ class _CustomFlagThumb extends SliderComponentShape {
     );
     painter.layout();
     painter.paint(canvas, Offset(center.dx - (flagSize / 2), center.dy - (flagSize / 2)));
+  }
+}
+
+
+class CloudAppBarClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    var path = Path();
+    path.lineTo(0.0, size.height - 40);
+    var firstControlPoint = Offset(size.width * 0.25, size.height);
+    var firstEndPoint = Offset(size.width * 0.5, size.height - 30);
+    var secondControlPoint = Offset(size.width * 0.75, size.height - 70);
+    var secondEndPoint = Offset(size.width, size.height - 40);
+
+    path.quadraticBezierTo(firstControlPoint.dx, firstControlPoint.dy, firstEndPoint.dx, firstEndPoint.dy);
+    path.quadraticBezierTo(secondControlPoint.dx, secondControlPoint.dy, secondEndPoint.dx, secondEndPoint.dy);
+
+    path.lineTo(size.width, 0.0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false;
   }
 }
