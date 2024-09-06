@@ -7,3 +7,4 @@ Les données sur les pays sont récupérées à partir de l'API REST Countries.
 
 ![image](https://github.com/user-attachments/assets/6ef23560-0f30-4c5c-a3b9-3cd95e5b7820)
 ![image](https://github.com/user-attachments/assets/9419a3d3-f7d7-41b5-aa29-9a2d9da8b5b7)
+![image](https://github.com/user-attachments/assets/01902918-16d9-4ef5-a34c-e765cd65ea99)
