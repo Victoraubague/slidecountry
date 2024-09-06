@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'LikePage.dart';  
+import 'SlidePage.dart'; 
 
 void main() {
   runApp(MyApp());
@@ -12,7 +14,55 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: CountriesListScreen(),
+      home: HomeScreen(), 
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    const CountriesListScreen(),  
+    const LikePage(),            
+    const SlidePage(),            
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Text('🚩', style: TextStyle(fontSize: 24)),
+            label: 'Drapeau',
+          ),
+          BottomNavigationBarItem(
+            icon: Text('❤️', style: TextStyle(fontSize: 24)),
+            label: 'Cœur',
+          ),
+          BottomNavigationBarItem(
+            icon: Text('⚡️', style: TextStyle(fontSize: 24)),
+            label: 'Éclair',
+          ),
+        ],
+      ),
     );
   }
 }
@@ -24,12 +74,9 @@ class CountriesListScreen extends StatefulWidget {
   _CountriesListScreenState createState() => _CountriesListScreenState();
 }
 
-class _CountriesListScreenState extends State<CountriesListScreen> with SingleTickerProviderStateMixin {
+class _CountriesListScreenState extends State<CountriesListScreen> {
   List<dynamic> countries = [];
   List<dynamic> filteredCountries = [];
-  bool isSorted = false;
-  bool isSearching = false;
-  late AnimationController _controller;
   final TextEditingController _searchController = TextEditingController();
 
   Future<void> fetchCountries() async {
@@ -49,39 +96,21 @@ class _CountriesListScreenState extends State<CountriesListScreen> with SingleTi
   void initState() {
     super.initState();
     fetchCountries();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
     _searchController.addListener(_filterCountries);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
-  void sortCountries() {
-    setState(() {
-      if (!isSorted) {
-        filteredCountries.sort((a, b) => a['name']['common'].compareTo(b['name']['common']));
-      } else {
-        filteredCountries.shuffle();
-      }
-      isSorted = !isSorted;
-    });
-
-    _controller.forward(from: 0.0);
-  }
-
   void _filterCountries() {
-    final query = _searchController.text.toLowerCase(); 
+    final query = _searchController.text.toLowerCase();
     setState(() {
       filteredCountries = countries.where((country) {
         final countryName = country['name']['common'].toLowerCase();
-        return countryName.contains(query); 
+        return countryName.contains(query);
       }).toList();
     });
   }
@@ -90,34 +119,7 @@ class _CountriesListScreenState extends State<CountriesListScreen> with SingleTi
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: !isSearching
-            ? const Text('Liste des pays')
-            : TextField(
-                controller: _searchController,
-                decoration: const InputDecoration(
-                  hintText: 'Rechercher un pays...',
-                  border: InputBorder.none,
-                ),
-                style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-              ),
-        actions: [
-          IconButton(
-            icon: Icon(isSearching ? Icons.cancel : Icons.search),
-            onPressed: () {
-              setState(() {
-                isSearching = !isSearching;
-                if (!isSearching) {
-                  filteredCountries = countries; 
-                  _searchController.clear();
-                }
-              });
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.sort_by_alpha),
-            onPressed: sortCountries,
-          ),
-        ],
+        title: const Text('Liste des pays'),
       ),
       body: filteredCountries.isEmpty
           ? const Center(child: CircularProgressIndicator())
