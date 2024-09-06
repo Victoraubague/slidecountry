@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: HomeScreen(), 
+      home: HomeScreen(),
     );
   }
 }
@@ -30,9 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const CountriesListScreen(),  
-    const LikePage(),            
-    const SlidePage(),            
+    const CountriesListScreen(),  // Country list page
+    const LikePage(),             // Tinder-style page
+    const SlidePage(),            // Ranking page
   ];
 
   void _onItemTapped(int index) {
@@ -77,6 +77,7 @@ class CountriesListScreen extends StatefulWidget {
 class _CountriesListScreenState extends State<CountriesListScreen> {
   List<dynamic> countries = [];
   List<dynamic> filteredCountries = [];
+  bool isSortedAscending = true; // Track sorting order
   final TextEditingController _searchController = TextEditingController();
 
   Future<void> fetchCountries() async {
@@ -105,6 +106,7 @@ class _CountriesListScreenState extends State<CountriesListScreen> {
     super.dispose();
   }
 
+  // Filter countries based on search input
   void _filterCountries() {
     final query = _searchController.text.toLowerCase();
     setState(() {
@@ -115,11 +117,50 @@ class _CountriesListScreenState extends State<CountriesListScreen> {
     });
   }
 
+  // Sort countries alphabetically
+  void _sortCountries() {
+    setState(() {
+      filteredCountries.sort((a, b) {
+        return isSortedAscending
+            ? a['name']['common'].compareTo(b['name']['common'])
+            : b['name']['common'].compareTo(a['name']['common']);
+      });
+      isSortedAscending = !isSortedAscending; // Toggle sorting order
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Liste des pays'),
+        actions: [
+          IconButton(
+            icon: Icon(isSortedAscending ? Icons.sort_by_alpha : Icons.sort_by_alpha_outlined),
+            onPressed: _sortCountries,
+          ),
+          
+          
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Rechercher un pays...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                prefixIcon: const Icon(Icons.search),
+              ),
+            ),
+          ),
+        ),
       ),
       body: filteredCountries.isEmpty
           ? const Center(child: CircularProgressIndicator())
@@ -135,8 +176,8 @@ class _CountriesListScreenState extends State<CountriesListScreen> {
                   ),
                   title: Text(country['name']['common']),
                   subtitle: Text(
-                    'Capital: ${country['capital'] != null ? country['capital'][0] : 'N/A'}\n'
-                    'Official: ${country['name']['official'] ?? 'N/A'}',
+                    'Capitale: ${country['capital'] != null ? country['capital'][0] : 'N/A'}\n'
+                    'Nom officiel: ${country['name']['official'] ?? 'N/A'}',
                   ),
                 );
               },
