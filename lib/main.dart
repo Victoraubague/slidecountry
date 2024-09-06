@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'LikePage.dart';
-import 'SlidePage.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<Widget> _pages = [
     const CountriesListScreen(), 
     const LikePage(),            
-    const SlidePage(),            
+
   ];
 
   void _onItemTapped(int index) {
@@ -72,10 +71,6 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.flash_on, size: 28),
             label: 'Tinder',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite, size: 28),
-            label: 'Classement',
           ),
         ],
       ),
