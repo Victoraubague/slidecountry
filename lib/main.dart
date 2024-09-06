@@ -238,7 +238,7 @@ class _CountriesListScreenState extends State<CountriesListScreen> {
         contentPadding: const EdgeInsets.all(15),
         leading: Image.network(
           country['flags']['png'],
-          width: 50,
+          width: 70,
           height: 50,
         ),
         title: Text(country['name']['common'], style: const TextStyle(fontWeight: FontWeight.bold)),
