@@ -10,10 +10,7 @@ class SlidePage extends StatelessWidget {
         title: const Text('⚡️ Page Éclair'),
       ),
       body: const Center(
-        child: Text(
-          'Ceci est la page avec un éclair ⚡️',
-          style: TextStyle(fontSize: 24),
-        ),
+        child: Text('Ceci est la page avec un éclair ⚡️', style: TextStyle(fontSize: 24)),
       ),
     );
   }

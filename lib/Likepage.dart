@@ -169,7 +169,8 @@ class _LikePageState extends State<LikePage> {
                       DropdownButton<String>(
                         value: selectedContinent,
                         icon: const Icon(Icons.public, color: Colors.black),
-                        dropdownColor: Colors.blue,
+                        dropdownColor: const Color.fromARGB(255, 199, 83, 228),
+                        
                         onChanged: (String? newValue) {
                           if (newValue != null) {
                             _filterByContinent(newValue);
