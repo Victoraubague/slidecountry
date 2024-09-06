@@ -26,8 +26,11 @@ class CountriesListScreen extends StatefulWidget {
 
 class _CountriesListScreenState extends State<CountriesListScreen> with SingleTickerProviderStateMixin {
   List<dynamic> countries = [];
+  List<dynamic> filteredCountries = [];
   bool isSorted = false;
+  bool isSearching = false;
   late AnimationController _controller;
+  final TextEditingController _searchController = TextEditingController();
 
   Future<void> fetchCountries() async {
     final response = await http.get(Uri.parse('https://restcountries.com/v3.1/all'));
@@ -35,14 +38,12 @@ class _CountriesListScreenState extends State<CountriesListScreen> with SingleTi
     if (response.statusCode == 200) {
       setState(() {
         countries = json.decode(response.body);
+        filteredCountries = countries;
       });
     } else {
       throw Exception('Failed to load countries');
     }
   }
-
-  //tout ce code avant sert à cherccher les données
-
 
   @override
   void initState() {
@@ -52,58 +53,88 @@ class _CountriesListScreenState extends State<CountriesListScreen> with SingleTi
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
+    _searchController.addListener(_filterCountries);
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   void sortCountries() {
     setState(() {
       if (!isSorted) {
-        countries.sort((a, b) => a['name']['common'].compareTo(b['name']['common']));
+        filteredCountries.sort((a, b) => a['name']['common'].compareTo(b['name']['common']));
       } else {
-        countries.shuffle(); 
+        filteredCountries.shuffle();
       }
       isSorted = !isSorted;
     });
 
-
     _controller.forward(from: 0.0);
+  }
+
+  void _filterCountries() {
+    final query = _searchController.text.toLowerCase(); 
+    setState(() {
+      filteredCountries = countries.where((country) {
+        final countryName = country['name']['common'].toLowerCase();
+        return countryName.contains(query); 
+      }).toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Countries of the World'),
+        title: !isSearching
+            ? const Text('Liste des pays')
+            : TextField(
+                controller: _searchController,
+                decoration: const InputDecoration(
+                  hintText: 'Rechercher un pays...',
+                  border: InputBorder.none,
+                ),
+                style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+              ),
         actions: [
+          IconButton(
+            icon: Icon(isSearching ? Icons.cancel : Icons.search),
+            onPressed: () {
+              setState(() {
+                isSearching = !isSearching;
+                if (!isSearching) {
+                  filteredCountries = countries; 
+                  _searchController.clear();
+                }
+              });
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.sort_by_alpha),
             onPressed: sortCountries,
           ),
         ],
       ),
-
-    
-      body: countries.isEmpty
+      body: filteredCountries.isEmpty
           ? const Center(child: CircularProgressIndicator())
-          : AnimatedList(
-              initialItemCount: countries.length,
-              itemBuilder: (context, index, animation) {
-                final country = countries[index];
-                return SizeTransition(
-                  sizeFactor: animation,
-                  child: ListTile(
-                    leading: Image.network(
-                      country['flags']['png'],
-                      width: 50,
-                      height: 50,
-                    ),
-                    title: Text(country['name']['common']),
-                    subtitle: Text('Capital: ${country['capital'] != null ? country['capital'][0] : 'N/A'}'),
+          : ListView.builder(
+              itemCount: filteredCountries.length,
+              itemBuilder: (context, index) {
+                final country = filteredCountries[index];
+                return ListTile(
+                  leading: Image.network(
+                    country['flags']['png'],
+                    width: 50,
+                    height: 50,
+                  ),
+                  title: Text(country['name']['common']),
+                  subtitle: Text(
+                    'Capital: ${country['capital'] != null ? country['capital'][0] : 'N/A'}\n'
+                    'Official: ${country['name']['official'] ?? 'N/A'}',
                   ),
                 );
               },
